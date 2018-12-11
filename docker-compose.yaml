@@ -1,0 +1,88 @@
+version: "2"
+services:
+  node1:
+    image: emqttd-docker-v2.3.11:20181129
+    container_name: node1
+    hostname: s1.emqtt.cc
+    restart: always
+    ports:
+    - 2883:1883
+    - 9083:8083
+    - 9883:8883
+    - 9084:8084
+    - 9080:8080
+    - 28083:18083
+    volumes:
+    - ./etc:/opt/emqx/etc
+    - ./data:/opt/emqx/data
+    environment:
+    - EMQ_NAME = emq
+    - EMQ_HOST= s1.emqtt.cc
+    - EMQ_NODE__NAME= emq@172.20.0.11
+    - EMQ_LISTENER__TCP__EXTERNAL=1883
+    - EMQ_NODE__COOKIE=ef16498f66804df1cc6172f6996d5492
+    networks:
+      emq-cluster:
+        ipv4_address: 172.20.0.11
+
+  node2:
+    image: emqttd-docker-v2.3.11:20181129
+    container_name: node2
+    hostname: s2.emqtt.cc
+    restart: always
+    ports:
+    - 3883:1883
+    - 11083:8083
+    - 11883:8883
+    - 11084:8084
+    - 11080:8080
+    - 38083:18083
+    volumes:
+    - ./etc2:/opt/emqx/etc
+    - ./data2:/opt/emqx/data
+    environment:
+    - EMQ_NAME = emq
+    - EMQ_HOST= s2.emqtt.cc
+    - EMQ_NODE__NAME= emq@172.20.0.12
+    - EMQ_LISTENER__TCP__EXTERNAL=1883
+    - EMQ_JOIN_CLUSTER= emq@172.20.0.11
+    - EMQ_NODE__COOKIE=ef16498f66804df1cc6172f6996d5492
+    networks:
+      emq-cluster:
+        ipv4_address: 172.20.0.12
+
+
+  node3:
+    image: emqttd-docker-v2.3.11:20181129
+    container_name: node3
+    hostname: s3.emqtt.cc
+    restart: always
+    ports:
+    - 4883:1883
+    - 12083:8083
+    - 12883:8883
+    - 12084:8084
+    - 12080:8080
+    - 48083:18083
+    volumes:
+    - ./etc3:/opt/emqx/etc
+    - ./data3:/opt/emqx/data
+    environment:
+    - EMQ_NAME = emq
+    - EMQ_HOST= s3.emqtt.cc
+    - EMQ_NODE__NAME= emq@172.20.0.13
+    - EMQ_LISTENER__TCP__EXTERNAL=1883
+    - EMQ_JOIN_CLUSTER= emq@172.20.0.11
+    - EMQ_NODE__COOKIE=ef16498f66804df1cc6172f6996d5492
+    networks:
+      emq-cluster:
+        ipv4_address: 172.20.0.13
+
+networks:   #声明
+  emq-cluster:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
